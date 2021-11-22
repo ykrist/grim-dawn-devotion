@@ -1,0 +1,38 @@
+{
+  "name": "Scarab",
+  "affinity_required": [
+    [
+      "primordial",
+      1
+    ]
+  ],
+  "affinity_bonus": [
+    [
+      "primordial",
+      3
+    ],
+    [
+      "order",
+      2
+    ]
+  ],
+  "bonus": [
+    [
+      "+15 Physique",
+      "+20 Armor"
+    ],
+    [
+      "+8% Shield Damage Blocked",
+      "Increases Energy Regeneration by 15%"
+    ],
+    [
+      "15% Bleeding Resistance",
+      "Increases Armor by 5%"
+    ],
+    [
+      "15% Reduced Stun Duration",
+      "+16% Shield Damage Blocked",
+      "40 Acid Retaliation"
+    ]
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "name": "Hyrian",
+  "affinity_required": [
+    [
+      "eldritch",
+      8
+    ],
+    [
+      "ascendant",
+      6
+    ]
+  ],
+  "affinity_bonus": [
+    [
+      "ascendant",
+      2
+    ],
+    [
+      "primordial",
+      2
+    ]
+  ],
+  "bonus": [
+    [
+      "+40% Elemental Damage",
+      "+40% to All Retaliation Damage"
+    ],
+    [
+      "+10% Pierce Resistance",
+      "+25% Shield Damage Blocked"
+    ],
+    [
+      "+280 Health",
+      "Healing Effects increased by 10%",
+      "Increases Armor by 5%"
+    ],
+    [
+      "12 Elemental Damage",
+      "+40% Shield Damage Blocked",
+      "+60% to All Retaliation Damage"
+    ],
+    [
+      "+50% Elemental Damage",
+      "15% Elemental Resistance",
+      "Increases Armor by 9%"
+    ],
+    [
+      "Hyrian's Glare (30% Chance when Hit)"
+    ]
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "Ulzaad",
+  "affinity_required": [
+    [
+      "primordial",
+      6
+    ],
+    [
+      "ascendant",
+      8
+    ]
+  ],
+  "affinity_bonus": [
+    [
+      "eldritch",
+      2
+    ],
+    [
+      "primordial",
+      2
+    ]
+  ],
+  "bonus": [
+    [
+      "+40% Physical Damage"
+    ],
+    [
+      "+10 Defensive Ability",
+      "15% Cold Resistance",
+      "15% Poison & Acid Resistance"
+    ],
+    [
+      "130 Health",
+      "10% Chaos Resistance"
+    ],
+    [
+      "130 Health",
+      "10% Aether Resistance"
+    ],
+    [
+      "10-16 Physical Damage",
+      "50% Physical Damage",
+      "50% Internal Trauma Damage"
+    ],
+    [
+      "Ulzaad's Decree (20% Chance on Attack)"
+    ]
+  ]
+}

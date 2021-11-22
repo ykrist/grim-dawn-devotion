@@ -1,0 +1,6 @@
+{
+  "name": "Crossroads (Order)",
+  "affinity_required": [],
+  "affinity_bonus": [["order", "1"]],
+  "bonus": [["+5% Health"]]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Crossroads (Eldritch)",
+  "affinity_required": [],
+  "affinity_bonus": [["eldritch", "1"]],
+  "bonus": [["+18 Offensive Ability"]]
+}

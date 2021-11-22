@@ -1,0 +1,50 @@
+{
+  "name": "Korvaak",
+  "affinity_required": [
+    [
+      "primordial",
+      18
+    ],
+    [
+      "eldritch",
+      10
+    ]
+  ],
+  "affinity_bonus": [
+  ],
+  "bonus": [
+    [
+      "+30% to All Damage",
+      "Bonus to All Pets",
+      "+30% to All Damage"
+    ],
+    [
+      "+6% Health",
+      "+2 Energy Regenerated Per Second",
+      "Bonus to All Pets",
+      "+6% Health"
+    ],
+    [
+      "20% Chaos Resistance",
+      "Bonus to All Pets",
+      "20% Chaos Resistance"
+    ],
+    [
+      "+50% to All Damage",
+      "+5% Offensive Ability",
+      "Bonus to All Pets",
+      "+30% to All Damage",
+      "+5% Offensive Ability"
+    ],
+    [
+      "Eye of Korvaak (100% Chance on Critical Attack)"
+    ],
+    [
+      "+50% to All Damage",
+      "+8% Crit Damage",
+      "Bonus to All Pets",
+      "+30% to All Damage",
+      "+8% Crit Damage"
+    ]
+  ]
+}

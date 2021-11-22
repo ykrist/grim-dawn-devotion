@@ -1,0 +1,38 @@
+{
+  "name": "Mantis",
+  "affinity_required": [
+    [
+      "chaos",
+      1
+    ]
+  ],
+  "affinity_bonus": [
+    [
+      "chaos",
+      2
+    ],
+    [
+      "ascendant",
+      3
+    ]
+  ],
+  "bonus": [
+    [
+      "+15% Pierce Damage",
+      "+20 Armor"
+    ],
+    [
+      "+10 Defensive Ability",
+      "10% Elemental Resistance"
+    ],
+    [
+      "+80 Health",
+      "+1.5 Energy Regenerated per Second"
+    ],
+    [
+      "5 Piercing Damage",
+      "+24% Pierce Damage",
+      "3% Physical Resistance"
+    ]
+  ]
+}
