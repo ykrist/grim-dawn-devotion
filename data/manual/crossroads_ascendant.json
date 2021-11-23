@@ -1,6 +1,6 @@
 {
   "name": "Crossroads (Ascendant)",
   "affinity_required": [],
-  "affinity_bonus": [["ascendant", "1"]],
+  "affinity_bonus": [["ascendant", 1]],
   "bonus": [["+18 Offensive Ability"]]
 }

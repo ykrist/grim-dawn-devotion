@@ -1,6 +1,6 @@
 {
   "name": "Crossroads (Primordial)",
   "affinity_required": [],
-  "affinity_bonus": [["primordial", "1"]],
+  "affinity_bonus": [["primordial", 1]],
   "bonus": [["+40 Defensive Ability"]]
 }
