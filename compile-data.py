@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import re
 import glob
 from common import *
@@ -66,8 +67,7 @@ def parse_bonus_description(desc: str, pet: bool) -> List[Bonus]:
             apply_to_pets=pet,
             kind=m.group('kind'),
             value=(a + b) / 2,
-            min_value=a,
-            max_value=b,
+            value_range=(a, b),
         )]
 
 
@@ -141,9 +141,11 @@ def normalise_kind(s: str) -> str:
         "damag": "damage",
         "converter": "converted",
         "physcial": "physical",
+        "pierce": "piercing",
     })
 
     clean = clean.replace("defense abilitiy", "defensive ability")
+    clean = clean.replace("of attack damage converted to health", "attack damage converted to health")
 
     return clean
 
@@ -157,11 +159,14 @@ def validate_topology(num_stars, topo):
     assert inds == set(range(num_stars)), "extra/missing stars in topology"
     return topo
 
-
+def parse_celestial_power(desc: str) -> CelestialPower:
+    desc = desc.lstrip('[').rstrip(']').strip()
+    name = re.sub('\s*\(.+\)\s*$', '', desc)
+    return CelestialPower(name, desc)
 
 def parse_star_bonus(bonus_list: List[str]) -> Union[List[Bonus], CelestialPower]:
     if re.search("\(\d+%( chance)? (on|when|at).+\)$", bonus_list[0], flags=re.IGNORECASE):
-        return CelestialPower(bonus_list[0])
+        return parse_celestial_power(bonus_list[0])
 
     try:
         idx = bonus_list.index("Bonus to All Pets")
@@ -179,10 +184,6 @@ def parse_star_bonus(bonus_list: List[str]) -> Union[List[Bonus], CelestialPower
 
     return ret
 
-def find_last_stars(topology: List) -> List[int]:
-    if not all(isinstance(x, int) for x in topology):
-        raise NotImplementedError
-    return [topology[-1]]
 
 if __name__ == '__main__':
     data = load_data()
@@ -192,9 +193,5 @@ if __name__ == '__main__':
 
     for k in sorted(set(b.kind for c in data for s in c['bonus'] if not isinstance(s, CelestialPower) for b in s)):
         print(k)
-
-    # for b in sorted((b for c in data for s in c['bonus'] for b in s), key=lambda x: x.kind):
-    #     if "acid" in b.kind:
-    #         print(b.kind, b)
 
     dump_json(data, "data/main.json")
