@@ -3,6 +3,7 @@ import argparse
 import json
 import re
 from prettytable import PrettyTable, PLAIN_COLUMNS
+from grim_dawn_data import WEAPON_TYPES
 from common import *
 
 def output_table(args, table: PrettyTable):
@@ -21,10 +22,12 @@ def bonus(args):
     selected_bonuses.sort(key=bonus_kind_lex_key)
 
     table = PrettyTable()
-    table.field_names = ["Bonus"]
+    table.field_names = ["Bonus", "Description", "Value"]
     table.align = "l"
+    table.align['Value'] = "c"
     for b in selected_bonuses:
-        table.add_row([b])
+        info = data.bonus_kinds_info[b]
+        table.add_row([b, info['display'], info['value']])
     output_table(args, table)
 
 def constellation(args):
@@ -34,10 +37,11 @@ def constellation(args):
 
     table = PrettyTable()
 
-    table.field_names = ["Constellation", "Stars"]
+    table.field_names = ["Constellation", "Stars", "Affinity Req.", "Affinity Bonus"]
     table.align["Constellation"] = "l"
+    fmt_affinity = lambda aff:  ", ".join(f"{aff[a]:2} {a[:3].capitalize()}" for a in data.affinities if a in aff)
     for c in selected_constellations:
-        table.add_row([c, len(data.constellations[c])])
+        table.add_row([c, len(data.constellations[c]), fmt_affinity(data.affinity_req[c]), fmt_affinity(data.affinity_bonus[c])])
 
     output_table(args, table)
 
@@ -55,7 +59,7 @@ def constellation_stars(args):
                 d = {
                     "Constellation": c,
                     "Star": s,
-                    "Bonuses": [b.display() for b in data.bonuses.get(s, [])]
+                    "Bonuses": [b.display() for b in data.star_bonuses.get(s, [])]
                 }
                 p = data.celestial_powers.get(s)
                 if p:
@@ -69,7 +73,7 @@ def constellation_stars(args):
             for s in data.constellations[c]:
                 star_name = f"{c} {s[1]}"
                 first_row = True
-                for b in data.bonuses.get(s, []):
+                for b in data.star_bonuses.get(s, []):
                     table.add_row([star_name if first_row else "", b.display()])
                     first_row = False
                 power = data.celestial_powers.get(s)
@@ -92,7 +96,17 @@ def celestial_powers(args):
     table.field_names = ["Power", "Star"]
     table.align = "l"
     for (cons, idx), p in powers:
+
         table.add_row([p.desc, f"{cons} {idx}"])
+
+    output_table(args, table)
+
+def weapon_types(args):
+    table = PrettyTable()
+    table.field_names = ["Type", "Description"]
+    table.align = "l"
+    for t, desc in WEAPON_TYPES.items():
+        table.add_row([t, desc])
 
     output_table(args, table)
 
@@ -123,6 +137,10 @@ if __name__ == '__main__':
     powers = sp.add_parser("powers", aliases=["p"], help="List Celestial Powers")
     add_common_args(powers)
     powers.set_defaults(func=celestial_powers)
+
+    weapons = sp.add_parser("weapons", aliases=["w"], help="List Weapon Types")
+    weapons.add_argument("--json", action='store_true', help="Output as JSON")
+    weapons.set_defaults(func=weapon_types)
 
     args = p.parse_args()
 

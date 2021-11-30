@@ -2,4 +2,6 @@ cache/
 data/scraped
 *.lp
 __pycache__
-*.yaml
+./*.toml
+example.toml
+

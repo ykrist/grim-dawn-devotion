@@ -1,0 +1,3 @@
+[submodule "grim-dawn-data-dump"]
+	path = grim-dawn-data-dump
+	url = git@github.com:ykrist/grim-dawn-data-dump.git

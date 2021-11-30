@@ -4,5 +4,7 @@ requests>=2.25.1
 termcolor>=1.1.0
 gurobipy>=9.5
 prettytable>=2.4.0
-PyYAML>=6.0
+toml>=0.10
 schema>=0.7.4
+
+-e ./grim-dawn-data-dump

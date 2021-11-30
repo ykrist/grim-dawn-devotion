@@ -7,7 +7,8 @@ from common import *
 from termcolor import colored
 import logging
 import contextlib
-
+from grim_dawn_data.bonuses import aggregate_bonuses
+from grim_dawn_data.json_utils import dumps_json, load_json
 
 @dataclasses.dataclass
 class OutputSettings:
@@ -262,7 +263,7 @@ def insert_straggler_stars(data: Data, config: Config, straggler_stars: List[Sta
 def group_stars_by_constellation(stars: Iterable[Star]) -> Dict[str, List[Star]]:
     by_constellation = {}
     for s in stars:
-        by_constellation.setdefault(s[0], []).append(s)
+        by_constellation.setdefault(s.cons, []).append(s)
     return by_constellation
 
 
@@ -276,7 +277,7 @@ def _fmt_stragglers(data: Data, stars: Iterable[Star], indent=0) -> str:
         mark_star = set()
         for s in sorted(stars):
             mark_star.add(len(bonus_lines))
-            for b in data.bonuses.get(s, []):
+            for b in data.star_bonuses.get(s, []):
                 bonus_lines.append(b.display())
             if s in data.celestial_powers:
                 bonus_lines.append(data.celestial_powers[s].desc)
@@ -300,21 +301,7 @@ def _fmt_stragglers(data: Data, stars: Iterable[Star], indent=0) -> str:
 
 
 def calculate_total_bonus(data: Data, chosen_stars: List[Star]) -> List[Bonus]:
-    aggregate = {}
-    bonus_list = []
-    for s in chosen_stars:
-        for b in data.bonuses.get(s, []):
-            if b.prob is not None or b.duration is not None or b.value_range is not None:
-                bonus_list.append(b)
-            else:
-                key = (b.kind, b.apply_to_pets)
-                if key not in aggregate:
-                    aggregate[key] = b
-                else:
-                    old = aggregate[key]
-                    aggregate[key] = dataclasses.replace(old, value=old.value + b.value)
-    bonus_list.extend(aggregate.values())
-    return bonus_list
+    return aggregate_bonuses(b for s in chosen_stars for b in data.star_bonuses.get(s, []))
 
 
 def pretty_print_solution(
@@ -326,18 +313,19 @@ def pretty_print_solution(
     actions = sol['order']
     chosen_stars = sol['stars']
 
+    print(colored(" GUIDE ".center(100, '='), "yellow", attrs=['bold']))
     for action in actions:
         try:
-            title = "Remove Constellations"
+            title = "Remove constellations"
             changed = action['remove']
             highlight_change = "red"
             prefix = "    -"
         except KeyError:
-            title = "Add Constellations"
+            title = "Add constellations"
             changed = action['add']
             highlight_change = "green"
             prefix = "    +"
-
+        title = colored(title, attrs=['bold']) + " in any order"
         print(title)
         for c in sorted(changed):
             if c in changed:
@@ -346,31 +334,43 @@ def pretty_print_solution(
                 print(" " * (len(prefix) + 1) + c)
         print()
         if 'straggler_stars' in action:
-            print("Unlocked Stars")
+            print(colored("Unlocked Stars", attrs=["bold"]) + " from this point onwards")
             print(_fmt_stragglers(data, action['straggler_stars'], indent=4))
 
+    print()
+    print(colored(" SUMMARY ".center(100, '='), "yellow", attrs=['bold']))
+    print(colored("Celestial Powers", attrs=['bold']))
+    powers = [(data.celestial_powers[s], s.cons) for s in chosen_stars if s in data.celestial_powers]
+    powers.sort(key=lambda x : x[1])
+    for power, c in powers:
+        print(f"{power.desc:<30}({c})")
+    print()
 
-    print("Total Bonuses")
-    sortkey = lambda b: (config.objective.get(b.objective_key(), 0) * -b.value, b.apply_to_pets, b.lex_key())
-    for b in sorted(calculate_total_bonus(data, chosen_stars), key=sortkey):
+    total_bonuses = calculate_total_bonus(data, chosen_stars)
+    objective_breakdown = { b.kind_id(): calculate_bonus_objective(config, b) for b in total_bonuses}
+    total_obj = sum(objective_breakdown.values())
+    print(colored(f"Total Bonuses [{total_obj:.1f}]", attrs=['bold']))
+    total_bonuses.sort(key=lambda b: (-objective_breakdown[b.kind_id()], b.kind_id()))
+    for b in total_bonuses:
         text = b.display()
-        if b.objective_key() in config.objective:
-            obj = b.value * config.objective[b.objective_key()]
+        obj = objective_breakdown[b.kind_id()]
+        if obj > 0:
             text = colored(f"[{obj:>9.1f}] " + text, 'blue', attrs=['bold'])
         elif not settings.show_all_bonuses:
             continue
         else:
-            text = colored(" " * 10 + text, attrs=['dark'])
+            text = colored(" " * 12 + text, attrs=['dark'])
         print(text)
 
 
 def main(data: Data, config: Config, output: OutputSettings):
-    force_stars = config.desired_stars
+    force_stars = config.desired_stars.copy()
+    force_stars.update(data.celestial_power_stars[p] for p in config.celestial_powers)
+
     with contextlib.redirect_stdout(open(os.devnull, 'w')):
         model = Model()
     model._data = data
     model._config = config
-    config.adjust_objective()
     if config.log_level > logging.DEBUG:
         model.setParam('OutputFlag', 0)
     model.setParam('LazyConstraints', 1)
@@ -378,7 +378,7 @@ def main(data: Data, config: Config, output: OutputSettings):
     Q = {a: model.addVar(name=f"Q[{a}]") for a in data.affinities}
 
     # Do we take star s?
-    X = {s: model.addVar(vtype=GRB.BINARY, name=f"X[{s[0]},{s[1]}]") for s in data.stars}
+    X = {s: model.addVar(vtype=GRB.BINARY, name=f"X[{s.cons},{s.idx}]") for s in data.stars}
 
     for s in force_stars:
         X[s].lb = 1
@@ -389,7 +389,7 @@ def main(data: Data, config: Config, output: OutputSettings):
 
     constraints = {}
     constraints['finish_constellation'] = {
-        s: model.addConstr(Y[s[0]] <= X[s])
+        s: model.addConstr(Y[s.cons] <= X[s])
         for s in data.stars
     }
 
@@ -401,7 +401,7 @@ def main(data: Data, config: Config, output: OutputSettings):
     constraints['affinity_req'] = {
         (s, a): model.addConstr(X[s] * amount <= Q[a])
         for s in data.stars
-        for a, amount in data.affinity_req[s[0]].items()
+        for a, amount in data.affinity_req[s.cons].items()
     }
 
     constraints['affinity_bonus'] = {
@@ -411,12 +411,10 @@ def main(data: Data, config: Config, output: OutputSettings):
 
     constraints['num_points'] = model.addConstr(quicksum(X.values()) == config.num_points)
 
-    model.setObjective(quicksum(
-        config.objective.get(b.objective_key(), 0) * b.value * X[s]
-        for s, blist in data.bonuses.items() if s not in config.ignore_stars
-        for b in blist
+    obj_coeff = calculate_star_objective(data, config)
+    model.setObjective(
+        quicksum(X[s] * c for s, c in obj_coeff.items()
     ), GRB.MAXIMIZE)
-
     model.optimize(grb_callback)
 
     if model.status == GRB.INFEASIBLE:
@@ -433,7 +431,7 @@ def main(data: Data, config: Config, output: OutputSettings):
         elif all(X[s].x > 0.9 for s in data.constellations[c]):
             final_constellations.append(c)
 
-    straggler_stars = [s for s in chosen_stars if s[0] not in final_constellations]
+    straggler_stars = [s for s in chosen_stars if s.cons not in final_constellations]
     order = solve_final_constellation_path(data, config, final_constellations)
     insert_straggler_stars(data, config, straggler_stars, order)
     sol = {"stars": chosen_stars, "order": order }

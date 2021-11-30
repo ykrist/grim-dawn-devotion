@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 import argparse
-import re
+import logging
 import sys
-
-import yaml
+import toml
 from schema import *
+from typing import List, Tuple, Set
+from pathlib import Path
+from functools import lru_cache
+
 from common import (
+    COUNTS_AS,
     CelestialPower,
     Config,
     Data,
@@ -16,9 +20,7 @@ from common import (
     get_powers_by_patterns,
     get_bonus_kinds_by_patterns
 )
-from typing import List, Tuple
-from pathlib import Path
-from functools import lru_cache
+
 
 cache = lru_cache(maxsize=None)
 
@@ -66,60 +68,66 @@ def lookup_celestial_power(input_data: str) -> Star:
 
 def is_bonus_kind(input_data: str) -> str:
     data = Data.load()
-    input_data = normalize_name(input_data)
+    if input_data not in data.selectable_bonus_kinds:
+        raise SchemaError(f"No bonus matches `{input_data}`")
+    return True
 
-    for b in data.bonus_kinds:
-        if b == input_data:
-            # return b
-            return True
+def is_weapon(input_data: str) -> str:
+    data = Data.load()
+    if input_data not in data.weapon_types:
+        raise SchemaError(f"`{input_data}` is not in {data.weapon_types}")
+    return True
 
-    raise SchemaError(f"No bonus matches `{input_data}`")
+def get_config_schema() -> Schema:
+    data = Data.load()
+    return Schema({
+        "points": int,
+        "bonus": OrDefault(Schema([{
+            "kind": And(str, is_bonus_kind),
+            "weight" : Use(float),
+            Optional("pets", default=False): bool
+        }
+        ]), default_factory=dict),
+        "weapons": [Or(*data.weapon_types)],
+        "celestial_powers": OrDefault(Schema([Or(*data.celestial_power_stars)]), default_factory=list),
+        "stars": OrDefault(Schema(
+            [And(str, Use(lambda x: parse_star(data, x)))],
+        ), default_factory=list),
+    })
 
-
-SCHEMA = Schema({
-    "points": int,
-    "bonuses": OrDefault(Schema([{
-        "bonus": And(str, is_bonus_kind),
-        Optional("weight", default=1): Use(float),
-        Optional("pets", default=False): bool
-    }
-    ]), default_factory=dict),
-    "celestial_powers": OrDefault(Schema([Use(lookup_celestial_power)]), default_factory=list),
-    "stars": OrDefault(Schema(
-        [And(str, Use(lambda x: parse_star(Data.load(), x)))],
-    ), default_factory=list),
-    "ignore_stars": OrDefault(Schema(
-        [And(str, Use(lambda x: parse_star(Data.load(), x)))]
-    ), default_factory=list)
-})
 
 
 def load_config(path: Path) -> Config:
     with open(path, 'r') as fp:
-        config = yaml.load(fp, yaml.CLoader)
+        config = toml.load(fp)
 
-    config = SCHEMA.validate(config)
+    config = get_config_schema().validate(config)
 
     objective = {}
-    for bonus in config['bonuses']:
-        kind = bonus['bonus']
+    for bonus in config['bonus']:
+        kind = bonus['kind']
         weight = bonus['weight']
-        okey = (kind, bonus['pets'])
+        pets = bonus['pets']
+        if pets:
+            kind = "Pets." + kind
         try:
-            objective[okey] += weight
+            objective[kind] += weight
         except KeyError:
-            objective[okey] = weight
+            objective[kind] = weight
 
-    return Config(
+    config =  Config(
         objective=objective,
-        ignore_stars=set(config['ignore_stars']),
-        desired_stars=set(config['stars'] + config['celestial_powers']),
+        weapons=set(config['weapons']),
+        desired_stars=set(config['stars']),
         num_points=config['points'],
+        celestial_powers=config['celestial_powers']
     )
+
+    return config
 
 
 def load_config_or_exit(path=None) -> Config:
-    path = path or Path("config.yaml")
+    path = path or Path("config.toml")
     try:
         return load_config(path)
     except SchemaError as e:
@@ -129,7 +137,7 @@ def load_config_or_exit(path=None) -> Config:
     except FileNotFoundError:
         print(f"File not found: {path}")
         sys.exit(1)
-    except yaml.YAMLError as e:
+    except toml.TomlDecodeError as e:
         print(f"Error parsing config file {path}")
         print(e)
         sys.exit(1)
@@ -143,19 +151,19 @@ def generate_config(args):
     bonuses = get_bonus_kinds_by_patterns(data, args.bonus)
     powers = get_powers_by_patterns(data, args.power) if args.power else []
 
-    yaml_data = {
-        "points": args.n,
-        "bonuses": [{"bonus": b, "weight" : 1 } for b in bonuses],
-        "celestial_powers": [p.name for _, p in powers],
-        "stars": None,
-        "ignore_stars": None
-    }
-    yaml_kwargs = dict(default_flow_style=False, sort_keys=False)
+    config = Config(
+        objective={b: 1 for b in bonuses},
+        desired_stars = set(),
+        weapons=set(),
+        celestial_powers = {p.name for _, p in powers},
+        num_points=args.n,
+        log_level=logging.WARNING,
+    )
+
     if args.o:
-        with open(args.o, 'w') as fp:
-            yaml.dump(yaml_data, fp, **yaml_kwargs)
+        config.to_file(args.o)
     else:
-        print(yaml.dump(yaml_data, **yaml_kwargs))
+        print(config.to_toml())
 
 
 if __name__ == '__main__':
