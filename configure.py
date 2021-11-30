@@ -134,9 +134,11 @@ def load_config_or_exit(path=None) -> Config:
         print(f"Error in config file {path}")
         print(e)
         sys.exit(1)
-    except FileNotFoundError:
-        print(f"File not found: {path}")
-        sys.exit(1)
+    except FileNotFoundError as e:
+        if e.filename == str(path):
+            print(f"File not found: {path}")
+            sys.exit(1)
+        raise
     except toml.TomlDecodeError as e:
         print(f"Error parsing config file {path}")
         print(e)

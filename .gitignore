@@ -1,7 +1,4 @@
-cache/
-data/scraped
 *.lp
 __pycache__
 ./*.toml
-example.toml
-
+!example-config.toml
