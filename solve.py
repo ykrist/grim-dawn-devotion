@@ -453,7 +453,7 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     config = configure.load_config_or_exit(args.config)
-
+    # config.log_level = logging.DEBUG
     logging.basicConfig(level=config.log_level)
     logging.getLogger("gurobipy").setLevel(logging.CRITICAL)
 

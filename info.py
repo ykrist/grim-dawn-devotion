@@ -95,9 +95,8 @@ def celestial_powers(args):
     table = PrettyTable()
     table.field_names = ["Power", "Star"]
     table.align = "l"
-    for (cons, idx), p in powers:
-
-        table.add_row([p.desc, f"{cons} {idx}"])
+    for star, p in powers:
+        table.add_row([p.desc, f"{star.cons} {star.idx}"])
 
     output_table(args, table)
 
