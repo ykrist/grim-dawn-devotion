@@ -57,8 +57,7 @@ def constellation_stars(args):
         for c in selected_constellations:
             for s in data.constellations[c]:
                 d = {
-                    "Constellation": c,
-                    "Star": s,
+                    "Star": s.to_json_dict(),
                     "Bonuses": [b.display() for b in data.star_bonuses.get(s, [])]
                 }
                 p = data.celestial_powers.get(s)
@@ -71,7 +70,7 @@ def constellation_stars(args):
         table.align["Constellation"] = "l"
         for c in selected_constellations:
             for s in data.constellations[c]:
-                star_name = f"{c} {s[1]}"
+                star_name = f"{s.cons} {s.idx}"
                 first_row = True
                 for b in data.star_bonuses.get(s, []):
                     table.add_row([star_name if first_row else "", b.display()])
