@@ -7,9 +7,9 @@ points = 47
 weapons = ['Offhand', 'Staff']
 
 # Which celestial powers to unlock (case insensitive). Run './info.py p' for a full list
-#celestial_powers = ["raise the dead", "time dilation"]
-celestial_powers = ["raise the dead", "elemental seeker"]
-#celestial_powers = ["elemental seeker"]
+celestial_powers = ["raise the dead"]
+#celestial_powers = ["raise the dead", "elemental seeker"]
+# celestial_powers = ["elemental seeker"]
 
 # Force these stars to be picked. Format is '[Constellation] [Index]', case insensitive; for example
 # 'Revenant 0' or 'Vire the Stone Matron 5'.
