@@ -161,55 +161,67 @@ Running `./solve.py -c example-config.toml` will figure out the best allocation 
 ============================================== GUIDE ===============================================
 Add constellations in any order
     + Crossroads (Chaos)
-
-Add constellations in any order
-    + Mantis
-    + Rat
+    + Crossroads (Order)
+    + Crossroads (Primordial)
 
 Add constellations in any order
     + Jackal
-    + Owl
-    + Raven
-    + Scholar's Light
-    + Toad
+    + Lotus
+    + Vulture
 
-Add constellations in any order
-    + Oklaine's Lantern
-    + Revenant
-
-Unlocked Stars from this point onwards
-    Blind Sage
-    (*) 30.0 Spirit
-     |  25.0 Offensive Ability
-     |  30.0 Physique
-     |  
-    (*) 80.0% Elemental Damage
-     |  25.0 Offensive Ability
-     |  15.0% Elemental Resistance
-     |  
-    (*) 40.0 Defensive Ability
-     |  30.0% Skill Disruption Protection
-     |  12.0% Crit Damage
-     |  
-    (*) 200.0% Frostburn Damage with 25.0% Increased Duration
-     |  100.0% Cold Damage
-     |  
-    (*) 200.0% Burn Damage with 25.0% Increased Duration
-     |  100.0% Fire Damage
-     |  
-    (*) Elemental Seeker
-    
-    Lotus
-    (*) 30.0 Health
-     |  100.0 Energy
-     |  
-    (*) 1.0 Energy Regenerated per second
-     |  Increases Energy Regeneration by 15.0%
-    
 Remove constellations in any order
     - Crossroads (Chaos)
 
+Add constellations in any order
+    + Panther
+    + Quill
+    + Revenant
+    + Scholar's Light
+
 Unlocked Stars from this point onwards
+    Owl
+    (*) 15.0 Cunning
+     |  15.0 Spirit
+     |  
+    (*) 8.0% Elemental Resistance
+     |  -5.0% Skill Energy Cost
+     |  
+    (*) 15.0 Defensive Ability
+     |  15.0% Reflected Damage Reduction
+     |  30.0% to All Damage
+    
+    Widow
+    (*) 40.0% Aether Damage
+    
+Add constellations in any order
+    + Harvestman's Scythe
+    + Oklaine's Lantern
+
+Unlocked Stars from this point onwards
+    Alladrah's Phoenix
+    (*) 40.0% Aether Damage
+     |  40.0% Elemental Damage
+    
+Remove constellations in any order
+    - Crossroads (Order)
+    - Crossroads (Primordial)
+    - Quill
+
+Unlocked Stars from this point onwards
+    Rattosh, the Veilwarden
+    (*) 150.0 Health
+     |  30.0 Offensive Ability
+     |  
+    (*) 80.0% Vitality Damage
+     |  80.0% Aether Damage
+     |  
+    (*) 150.0% Vitality Decay with 50.0% Increased Duration
+     |  45.0 Offensive Ability
+     |  
+    (*) 54.0 Vitality Decay Damage over 3.0 Seconds
+     |  100.0% Vitality Damage
+     |  100.0% Aether Damage
+    
     Wraith
     (*) 15.0% Lightning Damage
      |  15.0% Aether Damage
@@ -220,23 +232,22 @@ Unlocked Stars from this point onwards
 
 ============================================= SUMMARY ==============================================
 Celestial Powers
-Elemental Seeker              (Blind Sage)
 Raise the Dead                (Revenant)
 
-Total Bonuses [10391.0]
+Total Bonuses [15886.0]
+[   5980.0] 299.0% Aether Damage
+[   3000.0] Increases Energy Regeneration by 75.0%
 [   2280.0] 95.0% to All Damage
-[   1800.0] 9.0 Energy Regenerated per second
-[   1475.0] 250.0% Frostburn Damage with 45.0% Increased Duration
-[   1260.0] 63.0% Aether Damage
-[   1200.0] Increases Energy Regeneration by 30.0%
+[   2200.0] 11.0 Energy Regenerated per second
 [   1000.0] -5.0% Skill Energy Cost
-[    476.0] 119.0% Elemental Damage
-[    300.0] 100.0% Cold Damage
+[    375.0] 15.0% Energy
+[    316.0] 79.0% Elemental Damage
+[    180.0] 9.0% Spirit
 [    150.0] 15.0% Energy Absorbed from Enemy Spells
-[    150.0] 6.0% Energy
-[    110.0] 110.0 Spirit
-[    100.0] 100.0% Fire Damage
-[     90.0] 9.0% of Attack Damage converted to Health
+[    150.0] 30.0 Health Regenerated per second
+[    150.0] Increases Health Regeneration by 30.0%
+[     60.0] 6.0% of Attack Damage converted to Health
+[     45.0] 45.0 Spirit
 ```
 
 Each section of output must be completed in order; for example, Crossroads (Chaos), Crossroads (Eldritch) and Crossroads (Order) must all be picked before Lotus or Quill.  There are three types of section (excluding the summary at the end).  
