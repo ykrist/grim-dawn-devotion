@@ -1,24 +1,34 @@
 # Devotion Solver for [Grim Dawn](https://grimdawn.fandom.com/wiki/Grim_Dawn)
+
 ![image](./banner.png)
 
 ## Installation
+
 The main `solve.py` requires a [Gurobi](https://www.gurobi.com/downloads/end-user-license-agreement-academic/) license to run.  All the scripts require Python 3.7 or later.
 
-### Using `virtualenv`
-After cloning the repo, run this from the directory of this file: 
+You'll want to clone with `--recurse-submodules`:
+
 ```bash
-virtualenv venv
-pip install -r requirements.txt
-source venv/bin/activate
+git clone --recurse-submodules https://github.com/ykrist/grim-dawn-devotion.git
 ```
 
+After cloning the repo, run this from the directory of this file:
+
+```bash
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 ## Usage
+
 Grim Dawn's Devotion system is pretty complicated.  The `solve.py` script will:
+
 1. Figure out the best combination of stars in to end up with, subject which bonuses you decide are important (bigger weights = more important)
 2. Calculate a way to reach that final combination by adding and possible refunding constellations (refunding a few Devotion points as possible)
 
 In the config file `example-config.toml`
+
 ```toml
 # Number of devotion points available
 points = 47
@@ -146,7 +156,8 @@ weight = 200
 ```
 
 Running `./solve.py -c example-config.toml` will figure out the best allocation of your available Devoution points and figure out how to get there:
-```
+
+```text
 ============================================== GUIDE ===============================================
 Add constellations in any order
     + Crossroads (Chaos)
@@ -229,6 +240,7 @@ Total Bonuses [10391.0]
 ```
 
 Each section of output must be completed in order; for example, Crossroads (Chaos), Crossroads (Eldritch) and Crossroads (Order) must all be picked before Lotus or Quill.  There are three types of section (excluding the summary at the end).  
+
 - **Add Constellation**: Each of constellations in the group must be completed, but their order within the group doesn't matter
 - **Remove Constellation**: Each of constellations in the group must be refunded, but their order within the group doesn't matter
 - **Unlocked Stars**: These stars are part of constellations which are never finished.  They shown from the moment it becomes possible to choose them.  You can take them immediately, or focus on completing constellations instead.  In the example above, the star from Hyrian could have been chosen immediately, or after removing Crossroads (Chaos), or after getting Black Blood of Yugol.
@@ -236,7 +248,9 @@ Each section of output must be completed in order; for example, Crossroads (Chao
 The number on left in the **Total Bonuses** is the total objective value (`weight * value`) for the bonus type.
 
 `configure.py` will create a config file for you.  For example,
+
 ```bash
 ./configure.py -b "fire"
 ```
-will create a config file pre-filled with bonuses related to "fire" damage. `./info.py b` will list all bonuses.
+
+will create a config file pre-filled with bonuses related to "fire" damage. `./info.py b` will list all bonuses, but it's probably better to use [GrimTools](https://www.grimtools.com/calc/) to explore stars and constellations you might want.
